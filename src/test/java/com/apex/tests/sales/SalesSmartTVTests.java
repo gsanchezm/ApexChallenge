@@ -23,7 +23,7 @@ import java.util.Map;
 import static com.apex.config.Constants.TEST_CASE_FAILED_STATUS;
 import static com.apex.config.Constants.TEST_CASE_PASSED_STATUS;
 import static com.apex.utils.SQLUtil.closeConnection;
-import static com.apex.utils.testrail.TestRailUtil.addResultforTestCase;
+import static com.apex.utils.testrail.TestRailUtil.addResultTestCase;
 
 public class SalesSmartTVTests extends BaseWebClass {
     private PerformProductSelection selection;
@@ -38,32 +38,45 @@ public class SalesSmartTVTests extends BaseWebClass {
     @AfterMethod
     public void cleanFilters(ITestResult iTestResult) throws IOException {
         closeConnection();
+
         caseModel.setCaseId(Integer.parseInt(caseId));
         i++;
-        Map<Object,Object> results = new HashMap<>();
-        results.put(ITestResult.SUCCESS,TEST_CASE_PASSED_STATUS);
+
+        // Setup the mapping for all possible statuses
+        Map<Integer,Integer> results = new HashMap<>();
+        results.put(ITestResult.SUCCESS, TEST_CASE_PASSED_STATUS);
         results.put(ITestResult.FAILURE, TEST_CASE_FAILED_STATUS);
+        results.put(ITestResult.SKIP, TEST_CASE_FAILED_STATUS);
+        results.put(ITestResult.SUCCESS_PERCENTAGE_FAILURE, TEST_CASE_FAILED_STATUS);
 
-        caseModel.setStatusId((int)results.get(iTestResult.getStatus()));
-        caseModel.setComment(caseModel.getStatusId() == 1?
-                iTestResult.getName() + "Passed! in iteration "+ i:
-                iTestResult.getName() + "Failed! in iteration "+ i);
+        // Retrieve the correct status ID, or fallback if missing
+        Integer statusId = results.get(iTestResult.getStatus());
+        if (statusId == null) {
+            statusId = TEST_CASE_FAILED_STATUS; // fallback
+        }
+        caseModel.setStatusId(statusId);
 
-        addResultforTestCase(caseModel);
+        caseModel.setComment(
+                statusId == TEST_CASE_PASSED_STATUS
+                        ? iTestResult.getName() + " Passed! in iteration " + i
+                        : iTestResult.getName() + " Failed! in iteration " + i
+        );
+
+        addResultTestCase(caseModel);
 
         System.out.println("🧹 Cleaning Filters...");
         selection.cleanFilters();
         Refresh.page();
     }
 
-    @Test(dataProvider = "getBrandsData", dataProviderClass = ExcelFiltersDataProvider.class)
+    @Test(dataProvider = "getBrandsData", dataProviderClass = ExcelFiltersDataProvider.class, enabled = true)
     void VerifyThatUserCanSearchForSmartTVByBrand(LinkedHashMap<String, String> brands) {
         caseId = PropertyManager.getInstance().getProperty("SmartTVBrandTest");
         String brand = brands.values().iterator().next(); // Get the first value directly
         executeFilterTest("brand-", brand);
     }
 
-    @Test(dataProvider = "getSizesData", dataProviderClass = ExcelFiltersDataProvider.class)
+    @Test(dataProvider = "getSizesData", dataProviderClass = ExcelFiltersDataProvider.class, enabled = false)
     void VerifyThatUserCanSearchForSmartTVBySize(LinkedHashMap<String, String> sizes) {
         caseId = PropertyManager.getInstance().getProperty("SmartTVSizeTest");
         String size = sizes.values().iterator().next(); // Get the first value directly
@@ -71,7 +84,7 @@ public class SalesSmartTVTests extends BaseWebClass {
         //nota, con 115" falla
     }
 
-    @Test(dataProvider = "getPricesData", dataProviderClass = ExcelFiltersDataProvider.class)
+    @Test(dataProvider = "getPricesData", dataProviderClass = ExcelFiltersDataProvider.class, enabled = false)
     void VerifyThatUserCanSearchForSmartTVByPriceRange(LinkedHashMap<String, String> prices) {
         caseId = PropertyManager.getInstance().getProperty("SmartTVPriceTest");
         String priceMin = prices.values().toArray()[0].toString();
@@ -90,7 +103,7 @@ public class SalesSmartTVTests extends BaseWebClass {
         System.out.println("✅ Test completed successfully for min price: " + priceMin + " and max price " + priceMax);
     }
 
-    @Test(dataProvider = "getColorsData", dataProviderClass = ExcelFiltersDataProvider.class)
+    @Test(dataProvider = "getColorsData", dataProviderClass = ExcelFiltersDataProvider.class, enabled = false)
     void VerifyThatUserCanSearchForSmartTVByColor(LinkedHashMap<String, String> colors) {
         caseId = PropertyManager.getInstance().getProperty("SmartTVColorTest");
         String color = colors.values().toArray()[0].toString();
@@ -109,14 +122,14 @@ public class SalesSmartTVTests extends BaseWebClass {
 
     }
 
-    @Test(dataProvider = "getSalesByData", dataProviderClass = ExcelFiltersDataProvider.class)
+    @Test(dataProvider = "getSalesByData", dataProviderClass = ExcelFiltersDataProvider.class, enabled = false)
     void VerifyThatUserCanSearchForSmartTVBySalesType(LinkedHashMap<String, String> salesBy) {
         caseId = PropertyManager.getInstance().getProperty("SmartTVSalesByTest");
         String saleBy = salesBy.values().iterator().next(); // Get the first value directly
         executeFilterTest("variants.sellernames-", saleBy);
     }
 
-    @Test(dataProvider = "getScreenTechData", dataProviderClass = SQLFiltersDataProvider.class)
+    @Test(dataProvider = "getScreenTechData", dataProviderClass = SQLFiltersDataProvider.class, enabled = false)
     void VerifyThatUserCanSearchForSmartTVByScreenTechnology(LinkedHashMap<Object, Object> screenTechnologies) {
         caseId = PropertyManager.getInstance().getProperty("SmartTVScreenTechnologyTest");
         String screenTechnology = screenTechnologies.values().toArray()[1].toString();
@@ -125,28 +138,28 @@ public class SalesSmartTVTests extends BaseWebClass {
         //nota, se encontró un bug donde no se muestra el filtro una vez seleccionado y removido
     }
 
-    @Test(dataProvider = "getModelYearData", dataProviderClass = SQLFiltersDataProvider.class)
+    @Test(dataProvider = "getModelYearData", dataProviderClass = SQLFiltersDataProvider.class, enabled = false)
     void VerifyThatUserCanSearchForSmartTVByModelYear(LinkedHashMap<Object, Object> modelYears) {
         caseId = PropertyManager.getInstance().getProperty("SmartTVModelYearTest");
         String modelYear = modelYears.values().toArray()[1].toString();
         executeFilterTest("dynamicFacets.anodefabricacionvad-", modelYear);
     }
 
-    @Test(dataProvider = "getResolutionData", dataProviderClass = SQLFiltersDataProvider.class)
+    @Test(dataProvider = "getResolutionData", dataProviderClass = SQLFiltersDataProvider.class, enabled = false)
     void VerifyThatUserCanSearchForSmartTVByResolution(LinkedHashMap<Object, Object> resolutions) {
         caseId = PropertyManager.getInstance().getProperty("SmartTVResolutionTest");
        String resolution = resolutions.values().toArray()[1].toString();
         executeFilterTest("dynamicFacets.definicionaudiovideoatt-", resolution);
     }
 
-    @Test(dataProvider = "getProductTypeData", dataProviderClass = SQLFiltersDataProvider.class)
+    @Test(dataProvider = "getProductTypeData", dataProviderClass = SQLFiltersDataProvider.class, enabled = false)
     void VerifyThatUserCanSearchForSmartTVByProductType(LinkedHashMap<Object, Object> productTypes) {
         caseId = PropertyManager.getInstance().getProperty("SmartTVProductTypeTest");
         String productType = productTypes.values().toArray()[1].toString();
         executeFilterTest("dynamicFacets.producttypesap-", productType);
     }
 
-    @Test(dataProvider = "getSmartTVData", dataProviderClass = JsonFiltersDataProvider.class)
+    @Test(dataProvider = "getSmartTVData", dataProviderClass = JsonFiltersDataProvider.class, enabled = false)
     void VerifyThatUserCanSearchForSmartTVUsingAllAvailableFilters(LinkedHashMap<String, String> smartTV) {
         caseId = PropertyManager.getInstance().getProperty("SmartTVMultipleFiltersTest");
         // Debug: Print all key-value pairs

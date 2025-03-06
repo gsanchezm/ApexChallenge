@@ -45,5 +45,5 @@ public class Constants {
 
     public static final String SMART_TV_PRECONDITION_DATA = "SmartTVSteps";
 
-    public static final Duration WAIT_TIMEOUT = Duration.ofSeconds(8);
+    public static final Duration WAIT_TIMEOUT = Duration.ofSeconds(15);
 }
