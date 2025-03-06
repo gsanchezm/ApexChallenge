@@ -1,8 +1,6 @@
 package com.apex.questions;
 
-import com.apex.actions.Refresh;
 import com.apex.actions.Scroll;
-import com.apex.actions.WaitUntil;
 import com.apex.pages.HomePage;
 import org.testng.Assert;
 
@@ -10,7 +8,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.apex.actions.WaitUntil.textIsPresent;
-import static com.apex.actions.WaitUntil.waitUntilTextChanges;
 
 public class IsProductDisplayed extends HomePage {
 

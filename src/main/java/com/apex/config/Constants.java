@@ -28,7 +28,7 @@ public class Constants {
     public static final String TESTRAIL_USERNAME = PropertyManager.getInstance().getProperty("TestRailUsername");
     public static final String TESTRAIL_PASSWORD = PropertyManager.getInstance().getProperty("TestRailPass");
     public static final String TESTRAIL_ENGINE_URL = PropertyManager.getInstance().getProperty("TestRailUrl");
-    public static final int TEST_RUN_ID = 17;
+    public static final int TEST_RUN_ID = 18;
     public static final int TEST_CASE_PASSED_STATUS = 1;
     public static final int TEST_CASE_FAILED_STATUS = 5;
 
