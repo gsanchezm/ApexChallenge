@@ -1,0 +1,15 @@
+{
+    "SmartTV": [
+        {
+            "brand": "LG",
+            "size": "65 pulgadas",
+            "price": "$20000 - $30000 MXN",
+            "color": "Black",
+            "sales_by": "XHITAO NET",
+            "screen_technology": "QLED",
+            "model_year": "2023",
+            "resolution": "4K Ultra HD",
+            "product_type": "Led"
+        }
+    ]
+}
